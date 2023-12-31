@@ -58,7 +58,7 @@ public class LogMapper {
                 logValue(path, data, visited, o, pa);
             }
         } else {
-            data.put("doc-ref", visited.get(o));
+            data.put("path", visited.get(o));
         }
 
         return data;
