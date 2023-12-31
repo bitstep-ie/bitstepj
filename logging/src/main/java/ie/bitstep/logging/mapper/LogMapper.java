@@ -48,7 +48,6 @@ public class LogMapper {
         return map(path, data, visited, o);
     }
 
-    @SuppressWarnings("unchecked")
     Map<String, Object> map(String path, Map<String, Object> data, Map<Object, String> visited, Object o) {
         if (!visited.containsKey(o)) {
             ClassInfo ci = ReflectionUtils.getClassInfo(o);
@@ -56,15 +55,7 @@ public class LogMapper {
             visited.put(o, path);
 
             for (PropertyAccessor<?> pa : ci.getAccessors()) {
-                Optional<Log> log = (Optional<Log>) pa.getAnnotationByType(Log.class);
-
-                if (log.isPresent()) {
-                    if (pa.isCoreType()) {
-                        data.put(pa.getFieldName(), shape(pa, o));
-                    } else {
-                        data.put(pa.getFieldName(), map(makePath(path, pa), new LinkedHashMap<>(), visited, pa.get(o)));
-                    }
-                }
+                logValue(path, data, visited, o, pa);
             }
         } else {
             data.put("doc-ref", visited.get(o));
@@ -73,20 +64,49 @@ public class LogMapper {
         return data;
     }
 
+    @SuppressWarnings("unchecked")
+    private void logValue(String path, Map<String, Object> data, Map<Object, String> visited, Object o, PropertyAccessor<?> pa) {
+        Optional<Log> log = (Optional<Log>) pa.getAnnotation(Log.class);
+
+        if (log.isPresent()) {
+            if (pa.isCoreType()) {
+                data.put(pa.getFieldName(), apply(pa, o));
+            } else {
+                Object value = null;
+
+                try {
+                    value = pa.get(o);
+                }
+                catch (Exception e) {
+                    value = "Unable to retrieve property: " + pa.getFieldName();
+                }
+
+                data.put(pa.getFieldName(), map(makePath(path, pa), new LinkedHashMap<>(), visited, value));
+            }
+        }
+    }
+
     private static String makePath(String path, PropertyAccessor<?> pa) {
         return path + "." + pa.getFieldName();
     }
 
     @SuppressWarnings("unchecked")
-    private Object shape(PropertyAccessor<?> pa, Object o) {
-        Object value = pa.get(o);
+    private Object apply(PropertyAccessor<?> pa, Object o) {
+        Object value = null;
 
-        for (Annotation a : pa.getAnnotations().values()) {
-            AnnotationProcessor ap;
+        try {
+            value = pa.get(o);
 
-            if ((ap = annotationProcessors.get(a.annotationType())) != null) {
-                value = ap.apply(a, value);
+            for (Annotation a : pa.getAnnotations().values()) {
+                AnnotationProcessor ap;
+
+                if ((ap = annotationProcessors.get(a.annotationType())) != null) {
+                    value = ap.apply(a, value);
+                }
             }
+        }
+        catch (Exception e) {
+            value = "Unable to retrieve property: " + pa.getFieldName();
         }
 
         return value;

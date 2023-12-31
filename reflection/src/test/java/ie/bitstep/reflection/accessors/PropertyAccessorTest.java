@@ -1,10 +1,17 @@
 package ie.bitstep.reflection.accessors;
 
+import ie.bitstep.reflection.annotations.Mask;
+import ie.bitstep.reflection.annotations.MaskCard;
+import ie.bitstep.reflection.annotations.Modifier;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PropertyAccessorTest {
+    @MaskCard
     public String name = "Hello";
     private String privateName = "Goodbye";
     private String privateNameAnnotatedMethods = "Goodbye";
@@ -38,7 +45,7 @@ class PropertyAccessorTest {
     }
 
     @Test
-    void testConstructor() {
+    void testConstructor() throws NoSuchFieldException {
         PropertyAccessor<String> pa = new PropertyAccessor<>(PropertyAccessorTest.class, "name");
 
         assertThat(pa.getClazz()).isEqualTo(PropertyAccessorTest.class);
@@ -47,8 +54,12 @@ class PropertyAccessorTest {
     }
 
     @Test
-    void testPublicField() {
+    void testPublicField() throws InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<String> pa = new PropertyAccessor<>(PropertyAccessorTest.class, "name");
+
+        assertTrue(pa.hasAnnotation(Modifier.class));
+        assertTrue(pa.hasAnnotation(Mask.class));
+        assertTrue(pa.hasAnnotation(MaskCard.class));
 
         assertThat(pa.get(this)).isEqualTo("Hello");
 
@@ -58,7 +69,7 @@ class PropertyAccessorTest {
     }
 
     @Test
-    void testPrivateFieldNoAnnoatatedGetSet() throws NoSuchMethodException {
+    void testPrivateFieldNoAnnoatatedGetSet() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<String> pa = new PropertyAccessor<>(PropertyAccessorTest.class, "privateName");
 
         assertThat(pa.getGetter()).isEqualTo(this.getClass().getMethod("getPrivateName"));
@@ -70,7 +81,7 @@ class PropertyAccessorTest {
     }
 
     @Test
-    void testPrivateFieldAnnoatatedGetSet() throws NoSuchMethodException {
+    void testPrivateFieldAnnoatatedGetSet() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<String> pa = new PropertyAccessor<>(PropertyAccessorTest.class, "privateNameAnnotatedMethods");
 
         assertThat(pa.getGetter()).isEqualTo(this.getClass().getMethod("getPrivateNameAnnotatedMethod"));
@@ -81,7 +92,7 @@ class PropertyAccessorTest {
     }
 
     @Test
-    void testIntFieldNoAnnoatatedGetSet() throws NoSuchMethodException {
+    void testIntFieldNoAnnoatatedGetSet() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<Integer> pa = new PropertyAccessor<>(PropertyAccessorTest.class, "i");
 
         pa.set(this, 100);

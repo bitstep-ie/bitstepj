@@ -22,12 +22,8 @@ public class PropertyAccessor<T> {
     private Method setter;
     private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
 
-    public PropertyAccessor(Class<?> clazz, String fieldName) {
-        try {
-            init(null, clazz, clazz.getDeclaredField(fieldName));
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
+    public PropertyAccessor(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+        init(null, clazz, clazz.getDeclaredField(fieldName));
     }
 
     public PropertyAccessor(Class<?> clazz, Field field) {
@@ -74,6 +70,7 @@ public class PropertyAccessor<T> {
         for (Annotation a : type.getAnnotations()) {
             if (!a.annotationType().getPackageName().startsWith("java.lang.") && !annotations.containsKey(a.annotationType())) {
                 annotations.put(a.annotationType(), a);
+                populateAnnotations(a.annotationType());
             }
         }
     }
@@ -90,8 +87,12 @@ public class PropertyAccessor<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<T> getAnnotationByType(Class<? extends Annotation> annotation) {
-        return Optional.ofNullable((T)annotations.get(annotation));
+    public Optional<T> getAnnotation(Class<? extends Annotation> annotation) {
+        return Optional.ofNullable((T) annotations.get(annotation));
+    }
+
+    public boolean hasAnnotation(Class<? extends Annotation> annotation) {
+        return annotations.containsKey(annotation);
     }
 
     public boolean isCoreType() {
@@ -107,29 +108,19 @@ public class PropertyAccessor<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T get(Object o) {
-        try {
-            if (getter != null) {
-                return (T) getter.invoke(o);
-            }
-
-            return (T) field.get(o);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            // use an accessor method, of throw exception
-            throw new RuntimeException(e);
+    public T get(Object o) throws IllegalAccessException, InvocationTargetException {
+        if (getter != null) {
+            return (T) getter.invoke(o);
         }
+
+        return (T) field.get(o);
     }
 
-    public void set(Object o, T value) {
-        try {
-            if (setter != null) {
-                setter.invoke(o, value);
-            } else {
-                field.set(o, value); // NOSONAR
-            }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            // use an accessor method, of throw exception
-            throw new RuntimeException(e);
+    public void set(Object o, T value) throws InvocationTargetException, IllegalAccessException {
+        if (setter != null) {
+            setter.invoke(o, value);
+        } else {
+            field.set(o, value); // NOSONAR
         }
     }
 }

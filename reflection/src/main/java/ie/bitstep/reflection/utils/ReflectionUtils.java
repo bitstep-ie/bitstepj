@@ -3,6 +3,7 @@ package ie.bitstep.reflection.utils;
 import ie.bitstep.reflection.accessors.PropertyAccessor;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +24,12 @@ public class ReflectionUtils {
         return classInfo.computeIfAbsent(o.getClass(), ClassInfo::new);
     }
 
-    public static void setField(Object target, String name, Object value) {
+    public static void setField(Object target, String name, Object value) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<Object> pa = new PropertyAccessor<>(target.getClass(), name);
         pa.set(target, value);
     }
 
-    public static Object getField(Object target, String name) {
+    public static Object getField(Object target, String name) throws InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         PropertyAccessor<Object> pa = new PropertyAccessor<>(target.getClass(), name);
         return pa.get(target);
     }
