@@ -12,10 +12,10 @@ public class Dog {
     }
 
     public void bark() {
-        System.out.println("Bark");
+        System.out.println("Bark " + color + " dog");
     }
 
     public void fetch() {
-        System.out.println("Fetch");
+        System.out.println("Fetch " + color + " dog");
     }
 }
