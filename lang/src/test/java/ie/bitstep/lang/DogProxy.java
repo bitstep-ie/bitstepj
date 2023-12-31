@@ -5,6 +5,7 @@ import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -33,7 +34,9 @@ public class DogProxy {
         };
 
         Class<?> proxyCreator = f.createClass();
-        Proxy proxy = (Proxy) proxyCreator.newInstance();
+        Constructor<?>[] x = proxyCreator.getConstructors();
+        Proxy proxy = (Proxy) x[1].newInstance("red");
+//        Proxy proxy = (Proxy) proxyCreator.newInstance();
         proxy.setHandler(mi);
 
         return proxy;
