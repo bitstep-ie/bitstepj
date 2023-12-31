@@ -34,9 +34,8 @@ public class DogProxy {
         };
 
         Class<?> proxyCreator = f.createClass();
-        Constructor<?>[] x = proxyCreator.getConstructors();
-        Proxy proxy = (Proxy) x[1].newInstance("red");
-//        Proxy proxy = (Proxy) proxyCreator.newInstance();
+        Constructor<?> constructor = proxyCreator.getConstructor(String.class);
+        Proxy proxy = (Proxy) constructor.newInstance("red");
         proxy.setHandler(mi);
 
         return proxy;
