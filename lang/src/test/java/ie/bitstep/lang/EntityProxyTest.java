@@ -11,6 +11,7 @@ public class EntityProxyTest {
                 new Class[]{Dog.class},
                 new DynamicEntityHandler(new DogImpl("red")));
 
+        dog.setColor("black");
         dog.bark();
     }
 }

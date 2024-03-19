@@ -11,6 +11,10 @@ public class DogImpl implements Dog {
         this.color = color;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     public Object bark() {
         System.out.println("Bark " + color + " dog"); return this;
     }
