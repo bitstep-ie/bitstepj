@@ -6,12 +6,14 @@ import java.lang.reflect.Proxy;
 public class EntityProxyTest {
 
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Dog dog = (Dog) Proxy.newProxyInstance(
+        UserProfile userProfile = (UserProfile) Proxy.newProxyInstance(
                 EntityProxyTest.class.getClassLoader(),
-                new Class[]{Dog.class},
-                new DynamicEntityHandler(new DogImpl("red")));
+                new Class[]{UserProfile.class},
+                new DynamicEntityHandler(new UserProfileImpl()));
 
-        dog.setColor("black");
-        dog.bark();
+        userProfile.setName("John Allen");
+        userProfile.setCard("5222098058761278");
+
+        System.out.printf("%s: %s\n", userProfile.getName(), userProfile.getCard());
     }
 }
