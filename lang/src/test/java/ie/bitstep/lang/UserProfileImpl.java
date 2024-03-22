@@ -1,9 +1,7 @@
 package ie.bitstep.lang;
 
-public class UserProfileImpl implements UserProfile {
+public class UserProfileImpl extends EncryptedBlob implements UserProfile {
     private String name;
-
-    private String card;
 
     private String cardHash1;
 
@@ -19,24 +17,29 @@ public class UserProfileImpl implements UserProfile {
         return name;
     }
 
+    /**
+     * Dummy implementations, will be ignored
+     *
+     */
     @Override
     public void setCard(String card) {
-        this.card = card;
     }
 
-    @Override
     public void setCardHash1(String hash) {
         this.cardHash1 = hash;
     }
 
-    @Override
     public void setCardHash2(String hash) {
         this.cardHash2 = hash;
     }
 
+    /**
+     * Dummy implementations, will be ignored
+     * @return
+     */
     @Override
     public String getCard() {
-        return card;
+        return null;
     }
 
     @Override

@@ -9,10 +9,6 @@ public interface UserProfile {
     @Lookup
     public void setCard(String card);
 
-    public void setCardHash1(String hash);
-
-    public void setCardHash2(String hash);
-
     @Encrypted
     public String getCard();
 
